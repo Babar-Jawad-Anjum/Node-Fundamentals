@@ -1,0 +1,22 @@
+<div class="product-list">
+  <div class="products-detail">
+    <div class="product-image">
+      <img src="{{%IMAGE%}}" alt="img" height="120" width="120" />
+    </div>
+    <div class="product-specs">
+      <h3>{{%NAME%}}</h3>
+      <p><span>Description:</span>{{%DESC%}}</p>
+      <p><span>Category:</span>{{%CATEGORY%}}</p>
+      <p><span>Stock:</span>{{%STOCK%}}</p>
+      <p><span>Rating:</span>{{%RATING%}}</p>
+    </div>
+  </div>
+  <div class="products-detail">
+    <div class="product-info"><h4>Price: ${{%PRICE%}}</h4></div>
+    <div class="product-info"><h4>Color: Black</h4></div>
+    <div class="product-info">
+      <!-- <button class="btn btn-primary">Buy Now</button> -->
+      <a href="/products?id={{%ID%}}" class="btn btn-secondary">Show Details</a>
+    </div>
+  </div>
+</div>
