@@ -23,7 +23,7 @@ exports.getMovie = (req, res) => {
 
   let movie = movies.find((movie) => movie.id === movieId);
 
-  //================================== =======================//
+  //==========================================================//
   //       Send data back to client in JSend Json Format      //
   //==========================================================//
   if (movie) {

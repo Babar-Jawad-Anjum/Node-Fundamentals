@@ -2,17 +2,28 @@ const express = require("express");
 const morgan = require("morgan");
 const moviesRouter = require("./routes/moviesRoutes");
 
+// =========================================================================//
+//        Whatever variables we defined in config.env, those                //
+//        will be saved in the Node.js environment variables                //
+// =========================================================================//
+const dotenv = require("dotenv");
+dotenv.config({ path: "./.env" }); //.env file on root
+// console.log(process.env);
+
 const app = express();
 
-//Custom Middleware
+// =========================================================================//
+//                           Custom Middleware                              //
+// =========================================================================//
 const logger = function (req, res, next) {
-  console.log("Customer middleware called...");
+  console.log("Custom middleware called...");
   //next() will go to next handler, if we remove next(), then requ est will stuck here in this function.
   next();
 };
 
 app.use(express.json()); //This function express.json() will return a middleware function that will attach the request body(getting from client) to the req object i.e (req,res)
 app.use(morgan("dev")); //3rd party library/function which will return a middleware function, this middleware will log information of request in terminal, i.e "GET /api/v1/movies 200 4.608 ms - 266"
+app.use(express.static("./public")); // This express.static() will return middleware function that will serve static files inside public folder
 app.use(logger); // Adding custom middleware that will execute with every request
 
 // Base route
@@ -23,7 +34,9 @@ app.get("/", (req, res) => {
 //Movies routes handler
 app.use("/api/v1/movies", moviesRouter);
 
-// ====================  App Routes  ====================================//
+// =========================================================================//
+//                              App Routes                                  //
+// =========================================================================//
 // app.get("/api/v1/movies", getAllMovies);
 // app.get("/api/v1/movies/:movieId", getMovie);
 // app.post("/api/v1/movies", createMovie);
@@ -38,7 +51,9 @@ app.use("/api/v1/movies", moviesRouter);
 //   .patch(updateMovie)
 //   .delete(deleteMovie);
 
-// ====================  Mounting Routes  ====================================//
+// =========================================================================//
+//                           Mounting Routes                                //
+// =========================================================================//
 // const movieRouter = express.Router();
 
 // movieRouter.get("/", getAllMovies);
@@ -54,6 +69,6 @@ app.use("/api/v1/movies", moviesRouter);
 
 // app.use("/api/v1/movies", movieRouter);
 
-app.listen("3000", () => {
+app.listen(process.env.PORT || 3000, () => {
   console.log("Server running on port 3000");
 });
