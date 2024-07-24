@@ -1,5 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
+const mongoose = require("mongoose");
+
 const moviesRouter = require("./routes/moviesRoutes");
 
 // =========================================================================//
@@ -68,6 +70,26 @@ app.use("/api/v1/movies", moviesRouter);
 // movieRouter.route("/:id").get(getMovie).patch(updateMovie).delete(deleteMovie);
 
 // app.use("/api/v1/movies", movieRouter);
+
+// ============================================================================//
+//                           MongoDB Connection                                //
+// ============================================================================//
+mongoose
+  .connect(process.env.LOCAL_CONN_STR, {
+    useNewUrlParser: true,
+  })
+  .then((conn) => {
+    console.log(`
+      
+   // ========================================================//
+   //               Connected to Db successfully              //
+   // ========================================================//
+   
+   `);
+  })
+  .catch((error) => {
+    console.log("Error! Failed connection to DB...");
+  });
 
 app.listen(process.env.PORT || 3000, () => {
   console.log("Server running on port 3000");

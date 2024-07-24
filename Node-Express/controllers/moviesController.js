@@ -1,127 +1,146 @@
-const fs = require("fs");
+const Movie = require("../Models/movieModel");
+
+// ===================================================================================================//
+//                 Handlers that used mongoDb save, read, update or delete record                     //
+// ===================================================================================================//
+
+exports.getAllMovies = (req, res) => {};
+
+exports.getMovie = (req, res) => {};
+
+exports.createMovie = (req, res) => {};
+
+exports.updateMovie = (req, res) => {};
+
+exports.deleteMovie = (req, res) => {};
+
+// ===================================================================================================================//
+//                 Handlers that used file handling to save, read, update or delete record in file                    //
+// ===================================================================================================================//
+
+// const fs = require("fs");
 
 //Not a good practice, because the callback will be executed by event loop and readFileSync will block the event loop
-let movies = JSON.parse(fs.readFileSync("./data/movies.json"));
+// let movies = JSON.parse(fs.readFileSync("./data/movies.json"));
 
-//ROUTE HANDLERS
-exports.getAllMovies = (req, res) => {
-  //================================== =======================//
-  //       Send data back to client in JSend Json Format      //
-  //==========================================================//
-  res.status(200).json({
-    status: "success",
-    count: movies.length,
-    data: {
-      movies: movies,
-    },
-  });
-};
+// exports.getAllMovies = (req, res) => {
+//   //================================== =======================//
+//   //       Send data back to client in JSend Json Format      //
+//   //==========================================================//
+//   res.status(200).json({
+//     status: "success",
+//     count: movies.length,
+//     data: {
+//       movies: movies,
+//     },
+//   });
+// };
 
-exports.getMovie = (req, res) => {
-  //Convert movieId to number type which is string originally
-  let movieId = +req.params.movieId;
+// exports.getMovie = (req, res) => {
+//   //Convert movieId to number type which is string originally
+//   let movieId = +req.params.movieId;
 
-  let movie = movies.find((movie) => movie.id === movieId);
+//   let movie = movies.find((movie) => movie.id === movieId);
 
-  //==========================================================//
-  //       Send data back to client in JSend Json Format      //
-  //==========================================================//
-  if (movie) {
-    res.status(200).json({
-      status: "success",
-      data: {
-        movie: movie,
-      },
-    });
-  } else {
-    res.status(404).json({
-      status: "fail",
-      message: `OOPS! Movie with id ${req.params.movieId} not found.`,
-    });
-  }
-};
+//   //==========================================================//
+//   //       Send data back to client in JSend Json Format      //
+//   //==========================================================//
+//   if (movie) {
+//     res.status(200).json({
+//       status: "success",
+//       data: {
+//         movie: movie,
+//       },
+//     });
+//   } else {
+//     res.status(404).json({
+//       status: "fail",
+//       message: `OOPS! Movie with id ${req.params.movieId} not found.`,
+//     });
+//   }
+// };
 
-exports.createMovie = (req, res) => {
-  let newMovieId = movies[movies.length - 1].id + 1;
+// exports.createMovie = (req, res) => {
+//   let newMovieId = movies[movies.length - 1].id + 1;
 
-  let newMovie = Object.assign({ id: newMovieId }, req.body);
+//   let newMovie = Object.assign({ id: newMovieId }, req.body);
 
-  movies.push(newMovie);
+//   movies.push(newMovie);
 
-  fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
-    //==========================================================//
-    //       Send data back to client in JSend Json Format      //
-    //==========================================================//
-    res.status(201).json({
-      status: "success",
-      data: {
-        movie: newMovie,
-      },
-    });
-  });
-};
+//   fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
+//     //==========================================================//
+//     //       Send data back to client in JSend Json Format      //
+//     //==========================================================//
+//     res.status(201).json({
+//       status: "success",
+//       data: {
+//         movie: newMovie,
+//       },
+//     });
+//   });
+// };
 
-exports.updateMovie = (req, res) => {
-  //Convert movieId to number type which is string originally
-  let movieId = +req.params.movieId;
+// exports.updateMovie = (req, res) => {
+//   //Convert movieId to number type which is string originally
+//   let movieId = +req.params.movieId;
 
-  let movieToUpdate = movies.find((movie) => movie.id === movieId);
+//   let movieToUpdate = movies.find((movie) => movie.id === movieId);
 
-  //If movie not exist of given id
-  if (!movieToUpdate) {
-    res.status(404).json({
-      status: "fail",
-      message: `OOPS! Movie with id ${req.params.movieId} not found.`,
-    });
-  }
+//   //If movie not exist of given id
+//   if (!movieToUpdate) {
+//     res.status(404).json({
+//       status: "fail",
+//       message: `OOPS! Movie with id ${req.params.movieId} not found.`,
+//     });
+//   }
 
-  //Find Index of movie so that we can replace updated movie at where it was be
-  let movieIndex = movies.indexOf(movieToUpdate);
+//   //Find Index of movie so that we can replace updated movie at where it was be
+//   let movieIndex = movies.indexOf(movieToUpdate);
 
-  //Object.assign, what it will do is, it will merge two objects and whatever key value 2nd object has, it will update that part from the first object during merge
-  let updatedMovie = Object.assign(movieToUpdate, req.body);
+//   //Object.assign, what it will do is, it will merge two objects and whatever key value 2nd object has, it will update that part from the first object during merge
+//   let updatedMovie = Object.assign(movieToUpdate, req.body);
 
-  //Place updatedMovie at index where it was be
-  movies[movieIndex] = updatedMovie;
+//   //Place updatedMovie at index where it was be
+//   movies[movieIndex] = updatedMovie;
 
-  fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
-    //==========================================================//
-    //       Send data back to client in JSend Json Format      //
-    //==========================================================//
-    res.status(200).json({
-      status: "success",
-      data: {
-        movie: updatedMovie,
-      },
-    });
-  });
-};
+//   fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
+//     //==========================================================//
+//     //       Send data back to client in JSend Json Format      //
+//     //==========================================================//
+//     res.status(200).json({
+//       status: "success",
+//       data: {
+//         movie: updatedMovie,
+//       },
+//     });
+//   });
+// };
 
-exports.deleteMovie = (req, res) => {
-  //Convert movieId to number type which is string originally
-  let movieId = +req.params.movieId;
+// exports.deleteMovie = (req, res) => {
+//   //Convert movieId to number type which is string originally
+//   let movieId = +req.params.movieId;
 
-  let isMovieExist = movies.find((movie) => movie.id === movieId);
+//   let isMovieExist = movies.find((movie) => movie.id === movieId);
 
-  //If movie not exist of given id
-  if (!isMovieExist) {
-    res.status(404).json({
-      status: "fail",
-      message: `OOPS! Movie with id ${req.params.movieId} not found.`,
-    });
-  }
+//   //If movie not exist of given id
+//   if (!isMovieExist) {
+//     res.status(404).json({
+//       status: "fail",
+//       message: `OOPS! Movie with id ${req.params.movieId} not found.`,
+//     });
+//   }
 
-  let filteredMovies = movies.filter((movie) => movie.id !== movieId);
+//   let filteredMovies = movies.filter((movie) => movie.id !== movieId);
 
-  fs.writeFile("./data/movies.json", JSON.stringify(filteredMovies), (err) => {
-    //==========================================================//
-    //       Send data back to client in JSend Json Format      //
-    //==========================================================//
-    res.status(204).json({
-      status: "success",
-      data: {
-        movie: null,
-      },
-    });
-  });
-};
+//   fs.writeFile("./data/movies.json", JSON.stringify(filteredMovies), (err) => {
+//     //==========================================================//
+//     //       Send data back to client in JSend Json Format      //
+//     //==========================================================//
+//     res.status(204).json({
+//       status: "success",
+//       data: {
+//         movie: null,
+//       },
+//     });
+//   });
+// };
