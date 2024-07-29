@@ -1,18 +1,119 @@
 const Movie = require("../Models/movieModel");
 
 // ===================================================================================================//
-//                 Handlers that used mongoDb save, read, update or delete record                     //
+//                 Handlers that used mongoDb to save, read, update or delete record                     //
 // ===================================================================================================//
 
-exports.getAllMovies = (req, res) => {};
+exports.getAllMovies = async (req, res) => {
+  try {
+    let allMovies;
 
-exports.getMovie = (req, res) => {};
+    console.log(req.query);
 
-exports.createMovie = (req, res) => {};
+    //Of there is query string, filter data according to that, else fetch all records
+    if (Object.keys(req.query).length !== 0) {
+      allMovies = await Movie.find({
+        duration: req.query.duration,
+        ratings: req.query.ratings,
+      });
+      //another way of above line is because req.query is also object {duration: 154, ratings: 8.9}
+      // allMovies = await Movie.find(req.query);
+    } else {
+      allMovies = await Movie.find();
+    }
 
-exports.updateMovie = (req, res) => {};
+    res.status(200).json({
+      status: "success",
+      length: allMovies.length,
+      data: {
+        movies: allMovies,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
 
-exports.deleteMovie = (req, res) => {};
+exports.getMovie = async (req, res) => {
+  try {
+    // const movie = await Movie.find({ _id: req.params.movieId });
+    const movie = await Movie.findById(req.params.movieId);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        movie: movie,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+exports.createMovie = async (req, res) => {
+  try {
+    const movie = await Movie.create(req.body);
+
+    res.status(201).json({
+      status: "success",
+      data: {
+        movie: movie,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+exports.updateMovie = async (req, res) => {
+  try {
+    const updatedMovie = await Movie.findByIdAndUpdate(
+      req.params.movieId,
+      req.body,
+      // { new: true, runValidators: true } the first option will return modified document, and second will run validators/schema because in update, validators will not by default.
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        movie: updatedMovie,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+exports.deleteMovie = async (req, res) => {
+  try {
+    await Movie.findByIdAndDelete(req.params.movieId);
+    res.status(204).json({
+      status: "success",
+      data: null,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
 
 // ===================================================================================================================//
 //                 Handlers that used file handling to save, read, update or delete record in file                    //
@@ -23,7 +124,7 @@ exports.deleteMovie = (req, res) => {};
 //Not a good practice, because the callback will be executed by event loop and readFileSync will block the event loop
 // let movies = JSON.parse(fs.readFileSync("./data/movies.json"));
 
-// exports.getAllMovies = (req, res) => {
+// exports.getAllMovies = (req, res) => {f
 //   //================================== =======================//
 //   //       Send data back to client in JSend Json Format      //
 //   //==========================================================//
