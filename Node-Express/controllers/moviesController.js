@@ -1,4 +1,5 @@
 const Movie = require("../Models/movieModel");
+const ApiFeatures = require("../Utils/ApiFeatures");
 
 // ===================================================================================================//
 //                 Handlers that used mongoDb to save, read, update or delete record                     //
@@ -49,16 +50,19 @@ exports.getAllMovies = async (req, res) => {
       //
       //
       //
-      if (req.query.page && req.query.limit) {
-        const page = +req.query.page;
-        const limit = +req.query.limit;
-
-        const skip = (page - 1) * limit;
-
-        query = Movie.find(); // no await keyword here, so it will returns query
-        query = query.skip(skip).limit(limit);
-        allMovies = await query;
-      }
+      // if (req.query.page && req.query.limit) {
+      //   const page = +req.query.page;
+      //   const limit = +req.query.limit;
+      //   const skip = (page - 1) * limit;
+      //   query = Movie.find(); // no await keyword here, so it will returns query
+      //   query = query.skip(skip).limit(limit);
+      //   allMovies = await query;
+      // }
+      //
+      //
+      // we can also use paginate method  of reusable class from Utils directory
+      const moviesQuery = new ApiFeatures(Movie.find(), req.query).paginate();
+      allMovies = await moviesQuery.query;
     } else {
       allMovies = await Movie.find();
     }
