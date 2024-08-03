@@ -8,16 +8,57 @@ exports.getAllMovies = async (req, res) => {
   try {
     let allMovies;
 
-    console.log(req.query);
-
-    //Of there is query string, filter data according to that, else fetch all records
+    //if there is query string, filter data according to that, else fetch all records
     if (Object.keys(req.query).length !== 0) {
-      allMovies = await Movie.find({
-        duration: req.query.duration,
-        ratings: req.query.ratings,
-      });
-      //another way of above line is because req.query is also object {duration: 154, ratings: 8.9}
+      //<<<<< ============ Scenario-1 - get Movies of certain duration and ratings ================ >>>>>
+      //
+      //
+      //
+      // allMovies = await Movie.find({
+      //   duration: req.query.duration,
+      //   ratings: req.query.ratings,
+      // });
+      ////another way of above lines, because req.query is also object {duration: 154, ratings: 8.9}
       // allMovies = await Movie.find(req.query);
+      ////======= Another filter (Movies whose duration should be greater than or equal to 90 and ratings greater than or equal to 4.0) ======= //
+      // allMovies = await Movie.find({
+      //   duration: { $gte: 90 },
+      //   ratings: { $gte: 4.0 },
+      // });
+      //
+      //
+      //
+      //<<<<< ============ Scenario-2 - sort movies by anything sent in query params i.e price ================ >>>>>
+      //
+      //
+      //
+      // if (req.query.sort) {
+      // query = Movie.find(); // no await keyword here, so it will returns query
+      // query = query.sort(req.query.sort);
+      // allMovies = await query;
+      ////Now if we want to sort results by more than one option, i.e price, ratings so for that
+      // query = Movie.find(); // no await keyword here, so it will returns query
+      // sortBy = req.query.sort.split(",").join(" ");
+      // query = query.sort(sortBy);
+      // allMovies = await query;
+      // }
+      //
+      //
+      //
+      //<<<<< ============ Scenario-3 - Pagination ================ >>>>>
+      //
+      //
+      //
+      if (req.query.page && req.query.limit) {
+        const page = +req.query.page;
+        const limit = +req.query.limit;
+
+        const skip = (page - 1) * limit;
+
+        query = Movie.find(); // no await keyword here, so it will returns query
+        query = query.skip(skip).limit(limit);
+        allMovies = await query;
+      }
     } else {
       allMovies = await Movie.find();
     }
