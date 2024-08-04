@@ -160,6 +160,44 @@ exports.deleteMovie = async (req, res) => {
   }
 };
 
+//handler for aggregation pipeline, we can use use aggregation pipeline to
+//calculate aggregation like averages, count, sum , min or max
+exports.getMovieStats = async (req, res) => {
+  try {
+    //aggregation is a mongodb feature
+    const stats = await Movie.aggregate([
+      //Stage-1: match
+      { $match: { ratings: { $gte: 2 } } },
+      //Stage-2: group
+      {
+        $group: {
+          _id: "$releaseYear", //=============== We want to group movies based on releaseYear i.e 2 movies released in 2013 etc, Grouping will be done based on what we mention in _id
+          avgRating: { $avg: "$ratings" }, //=== Calculate avg rating of movies from getting in Stage-1
+          avgPrice: { $avg: "$price" }, //====== Calculate avg Price of movies from getting in Stage-1
+          minPrice: { $min: "$price" }, //====== Calculate min price of movie from data getting in Stage-1
+          maxPrice: { $max: "$price" }, //====== Calculate max price of movie from data getting in Stage-1
+          priceTotal: { $sum: "$price" }, //==== Calculate sum of price of all movies from data getting in Stage-1
+          movieCount: { $sum: 1 }, //=========== Calculate total number of movies on which this aggregation happening
+        },
+      },
+      //Stage-3: sort
+      { $sort: { minPrice: 1 } }, //============ Sort by minPrice in asc order, remember this sorting stage will apply to results of above 2 stages
+    ]);
+    res.status(200).json({
+      status: "success",
+      count: stats.length,
+      data: {
+        stats,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 // ===================================================================================================================//
 //                 Handlers that used file handling to save, read, update or delete record in file                    //
 // ===================================================================================================================//
