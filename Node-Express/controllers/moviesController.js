@@ -198,6 +198,46 @@ exports.getMovieStats = async (req, res) => {
   }
 };
 
+//handler for aggregation pipeline, getAllMovies of given genre in params
+exports.getMovieByGenre = async (req, res) => {
+  try {
+    const genre = req.params.genre;
+    const movies = await Movie.aggregate([
+      //Stage-1
+      { $unwind: "$genres" },
+      //Stage-2
+      {
+        $group: {
+          _id: "$genres",
+          movieCount: { $sum: 1 },
+          movies: { $push: "$name" },
+        },
+      },
+      //Stage-3
+      { $addFields: { genre: "$_id" } },
+      //Stage-4, remove _id from results because we replace _id with genre in previous stage i.e Stage-3
+      { $project: { _id: 0 } },
+      //Stage-5, sort data by desc order by movieCount field
+      { $sort: { movieCount: -1 } },
+      //State-6, send only that document whose genre match with genre getting in params
+      { $match: { genre: genre } },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      count: movies.length,
+      data: {
+        movies,
+      },
+    });
+  } catch (err) {
+    res.stats(404).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 // ===================================================================================================================//
 //                 Handlers that used file handling to save, read, update or delete record in file                    //
 // ===================================================================================================================//

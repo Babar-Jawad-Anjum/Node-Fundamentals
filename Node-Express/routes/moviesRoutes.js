@@ -6,11 +6,13 @@ const {
   updateMovie,
   deleteMovie,
   getMovieStats,
+  getMovieByGenre,
 } = require("../controllers/moviesController");
 
 const router = express.Router();
 
 router.get("/movie-stats", getMovieStats);
+router.get("/movies-by-genre/:genre", getMovieByGenre);
 
 //==================================================
 router.get("/", getAllMovies);
