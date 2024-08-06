@@ -93,6 +93,28 @@ movieSchema.post("save", function (doc, next) {
   next();
 });
 
+//Same like above document middlewares , we also have query middlewares. i.e "find".
+movieSchema.pre("find", function (next) {
+  //here this keyword will point to query object, not document
+  //return all those documents whose releaseDate is less than or equal to current date
+  this.find({ releaseDate: { $lte: Date.now() } });
+  next();
+});
+
+// 
+//
+//The above will only run for "find" method and if we want to fetch single movie whose releaseDate is in
+//future then we'll fetch that which is issue, so for that to ensure it works properly for find, findById,
+//updateById etc etc we can use regular expression just like below
+//
+//
+// movieSchema.pre(/^find/, function (next) {
+//   this.find({ releaseDate: { $lte: Date.now() } });
+//   next();
+// });
+//
+//
+
 const Movie = mongoose.model("Movie", movieSchema);
 
 module.exports = Movie;
