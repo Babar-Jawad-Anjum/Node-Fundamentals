@@ -36,6 +36,14 @@ app.get("/", (req, res) => {
 //Movies routes handler
 app.use("/api/v1/movies", moviesRouter);
 
+//Default router handler
+app.all("*", (req, res, next) => {
+  res.status(404).json({
+    status: "fail",
+    message: `can't find ${req.originalUrl} on the server!`,
+  });
+});
+
 // =========================================================================//
 //                              App Routes                                  //
 // =========================================================================//
