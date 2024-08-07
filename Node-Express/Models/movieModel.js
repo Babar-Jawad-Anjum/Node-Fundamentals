@@ -101,7 +101,7 @@ movieSchema.pre("find", function (next) {
   next();
 });
 
-// 
+//
 //
 //The above will only run for "find" method and if we want to fetch single movie whose releaseDate is in
 //future then we'll fetch that which is issue, so for that to ensure it works properly for find, findById,
@@ -114,6 +114,12 @@ movieSchema.pre("find", function (next) {
 // });
 //
 //
+
+// aggregation middleware
+movieSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { releaseDate: { $lte: new Date() } } });
+  next();
+});
 
 const Movie = mongoose.model("Movie", movieSchema);
 
