@@ -24,9 +24,20 @@ const movieSchema = new mongoose.Schema(
     },
     ratings: {
       type: Number,
-      //we can use min, max on type number
-      min: [1, "Ratings must be 1.0 or above"],
-      max: [10, "Ratings must be 10 or below"],
+
+      //we can use min, max on type number - BuiltIn Validator
+      // min: [1, "Ratings must be 1.0 or above"],
+      // max: [10, "Ratings must be 10 or below"],
+
+      //---------------------------------------------------
+
+      //Custom validator
+      validate: {
+        validator: function (value) {
+          return value >= 1 && value <= 10;
+        },
+        message: "Ratings should be above 1 and below 10",
+      },
     },
     totalRating: {
       type: Number,
