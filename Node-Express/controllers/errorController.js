@@ -33,7 +33,7 @@ const castErrorHandler = (err) => {
   return new CustomError(msg, 400);
 };
 const duplicateKeyErrorHandler = (err) => {
-  const msg = `There is already a movie with name ${err.keyValue.name}. please user another name!`;
+  const msg = `There is already a movie with name ${err.keyValue.name}. please use another name!`;
   return new CustomError(msg, 400);
 };
 
