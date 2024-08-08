@@ -5,6 +5,7 @@ const CustomError = require("./Utils/CustomError");
 const globalErrorHandler = require("./controllers/errorController");
 
 const moviesRouter = require("./routes/moviesRoutes");
+const authRouter = require("./routes/authRoutes");
 
 // =========================================================================//
 //        Whatever variables we defined in config.env, those                //
@@ -37,6 +38,8 @@ app.get("/", (req, res) => {
 
 //Movies routes handler
 app.use("/api/v1/movies", moviesRouter);
+//Auth routes handler
+app.use("/api/v1/users", authRouter);
 
 //Default router handler
 app.all("*", (req, res, next) => {
