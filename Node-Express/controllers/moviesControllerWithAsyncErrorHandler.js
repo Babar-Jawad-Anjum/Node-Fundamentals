@@ -1,7 +1,7 @@
 // ===================================================================================================//
 //                                                                                                    //
-//                 This file is not being used anywhere, this is controller for                       //
-//                 movies with asyncErrorHandler i.e global error handler technique                   //
+//                 this is same file as moviesController with                                         //
+//                 asyncErrorHandler i.e global error handler technique                               //
 //                                                                                                    //
 // ===================================================================================================//
 

@@ -7,7 +7,7 @@ const {
   deleteMovie,
   getMovieStats,
   getMovieByGenre,
-} = require("../controllers/moviesController");
+} = require("../controllers/moviesControllerWithAsyncErrorHandler");
 
 const router = express.Router();
 
