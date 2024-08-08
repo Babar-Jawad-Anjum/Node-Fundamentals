@@ -1,5 +1,6 @@
 const Movie = require("../Models/movieModel");
 const ApiFeatures = require("../Utils/ApiFeatures");
+const CustomError = require("../Utils/CustomError");
 
 // ===================================================================================================//
 //                 Handlers that used mongoDb to save, read, update or delete record                     //
@@ -101,7 +102,7 @@ exports.getMovie = async (req, res) => {
   }
 };
 
-exports.createMovie = async (req, res) => {
+exports.createMovie = async (req, res, next) => {
   try {
     const movie = await Movie.create(req.body);
 
@@ -112,10 +113,12 @@ exports.createMovie = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+    // res.status(400).json({
+    //   status: "fail",
+    //   message: err.message,
+    // });
+    const error = new CustomError(err.message, 400);
+    next(error);
   }
 };
 

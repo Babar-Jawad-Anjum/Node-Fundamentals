@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const CustomError = require("./Utils/CustomError");
 
 const moviesRouter = require("./routes/moviesRoutes");
 
@@ -38,10 +39,21 @@ app.use("/api/v1/movies", moviesRouter);
 
 //Default router handler
 app.all("*", (req, res, next) => {
-  res.status(404).json({
-    status: "fail",
-    message: `can't find ${req.originalUrl} on the server!`,
-  });
+  // res.status(404).json({
+  //   status: "fail",
+  //   message: `can't find ${req.originalUrl} on the server!`,
+  // });
+  //====================================================================
+  // const err = new Error(`can't find ${req.originalUrl} on the server!`);
+  // err.status = "fail";
+  // err.statusCode = 404;
+  // next(err);
+  //====================================================================
+  const err = new CustomError(
+    `can't find ${req.originalUrl} on the server!`,
+    404
+  );
+  next(err);
 });
 
 // =========================================================================//
@@ -78,6 +90,20 @@ app.all("*", (req, res, next) => {
 // movieRouter.route("/:id").get(getMovie).patch(updateMovie).delete(deleteMovie);
 
 // app.use("/api/v1/movies", movieRouter);
+
+// ============================================================================//
+//                    Global Error handling middleware                         //
+// ============================================================================//
+
+app.use((error, req, res, next) => {
+  error.statusCode = error.statusCode || 500;
+  error.status = error.status || "error";
+
+  res.status(error.statusCode).json({
+    status: error.status,
+    message: error.message,
+  });
+});
 
 // ============================================================================//
 //                           MongoDB Connection                                //
