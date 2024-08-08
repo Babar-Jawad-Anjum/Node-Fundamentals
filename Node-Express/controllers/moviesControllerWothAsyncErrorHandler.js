@@ -8,6 +8,7 @@
 const Movie = require("../Models/movieModel");
 const ApiFeatures = require("../Utils/ApiFeatures");
 const asyncErrorHandler = require("../Utils/asyncErrorHandler");
+const CustomError = require("../Utils/CustomError");
 
 exports.getAllMovies = asyncErrorHandler(async (req, res, next) => {
   let allMovies;
@@ -33,6 +34,12 @@ exports.getAllMovies = asyncErrorHandler(async (req, res, next) => {
 exports.getMovie = asyncErrorHandler(async (req, res, next) => {
   // const movie = await Movie.find({ _id: req.params.movieId });
   const movie = await Movie.findById(req.params.movieId);
+
+  //Handling not found, sort of thing
+  if (!movie) {
+    const error = new CustomError("Movie with that ID is not found!", 404);
+    return next(error);
+  }
 
   res.status(200).json({
     status: "success",
@@ -63,6 +70,11 @@ exports.updateMovie = asyncErrorHandler(async (req, res) => {
     }
   );
 
+  if (!updatedMovie) {
+    const error = new CustomError("Movie with that ID is not found!", 404);
+    return next(error);
+  }
+
   res.status(200).json({
     status: "success",
     data: {
@@ -72,7 +84,11 @@ exports.updateMovie = asyncErrorHandler(async (req, res) => {
 });
 
 exports.deleteMovie = asyncErrorHandler(async (req, res) => {
-  await Movie.findByIdAndDelete(req.params.movieId);
+  const deletedMovie = await Movie.findByIdAndDelete(req.params.movieId);
+  if (!deletedMovie) {
+    const error = new CustomError("Movie with that ID is not found!", 404);
+    return next(error);
+  }
   res.status(204).json({
     status: "success",
     data: null,
