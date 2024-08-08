@@ -95,14 +95,43 @@ app.all("*", (req, res, next) => {
 //                    Global Error handling middleware                         //
 // ============================================================================//
 
+//In dev, we want as much information about error as possible
+const devErrors = (res, error) => {
+  res.status(error.statusCode).json({
+    status: error.status,
+    message: error.message,
+    stackTrace: error.stack,
+    error: error,
+  });
+};
+
+//In prod, we want to leak as little info as possible to avoid any misuse of error messages to secure application from hackers
+const prodErrors = (res, error) => {
+  //In prod, we want to send only those errors to the client which is an operational error due to security reasons
+  if (error.isOperational) {
+    res.status(error.statusCode).json({
+      status: error.status,
+      message: error.message,
+    });
+  }
+  //for other errors i.e created by mongoose etc will be treated as Non-Operational errors
+  else {
+    res.status(500).json({
+      status: "error",
+      message: "Something went wrong! Please try agin later!",
+    });
+  }
+};
+
 app.use((error, req, res, next) => {
   error.statusCode = error.statusCode || 500;
   error.status = error.status || "error";
 
-  res.status(error.statusCode).json({
-    status: error.status,
-    message: error.message,
-  });
+  if (process.env.NODE_ENV === "development") {
+    devErrors(res, error);
+  } else if (process.env.NODE_ENV === "production") {
+    prodErrors(res, error);
+  }
 });
 
 // ============================================================================//
