@@ -19,6 +19,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please enter a password"],
     minlength: 8,
+    //Password field will not be included in res that will send back to client
+    select: false,
   },
   confirmPassword: {
     type: String,
@@ -43,6 +45,11 @@ userSchema.pre("save", async function (next) {
   this.confirmPassword = undefined;
   next();
 });
+
+//adding method into User model
+userSchema.methods.comparePasswordInDb = async function (pswd, pswdDb) {
+  return await bcrypt.compare(pswd, pswdDb);
+};
 
 const User = mongoose.model("User", userSchema);
 
