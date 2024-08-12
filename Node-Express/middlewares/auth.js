@@ -4,8 +4,7 @@ const jwt = require("jsonwebtoken");
 const util = require("util");
 const User = require("../Models/userModel");
 const sendEmail = require("../Utils/email");
-
-const decodedToken = async (encryptedToken) => {};
+const crypto = require("crypto");
 
 exports.protectedRoute = asyncErrorHandler(async (req, res, next) => {
   let jwtToken;
@@ -106,4 +105,41 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
     );
   }
 });
-exports.resetPassword = (req, res, next) => {};
+exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
+  //1: IF THE USER EXIST WITH THE GIVEN TOKEN & TOKEN HAS NOT EXPIRED
+  const encryptToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: encryptToken,
+    passwordResetTokenExpires: { $gt: Date.now() }, //should be valid, not expired
+  });
+  if (!user) {
+    return next(new CustomError("Token is invalid or has expired", 400));
+  }
+
+  //2: RESETTING USER PASSWORD
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetTokenExpires = undefined;
+  user.passwordChangedAt = Date.now();
+  //validation should happen now, that's why not passing this "validateBeforeSave" as an option
+  await user.save();
+
+  //3: LOGIN THE USER MEANS GENERATE JWT AND SEND BACK TO CLIENT
+  const loginToken = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.LOGIN_EXPIRES,
+    }
+  );
+
+  res.status(201).json({
+    status: "success",
+    token: loginToken,
+  });
+});
