@@ -7,6 +7,8 @@ const globalErrorHandler = require("./controllers/errorController");
 const moviesRouter = require("./routes/moviesRoutes");
 const authRouter = require("./routes/authRoutes");
 
+const rateLimit = require("express-rate-limit");
+
 // =========================================================================//
 //        Whatever variables we defined in config.env, those                //
 //        will be saved in the Node.js environment variables                //
@@ -25,6 +27,14 @@ const logger = function (req, res, next) {
   //next() will go to next handler, if we remove next(), then requ est will stuck here in this function.
   next();
 };
+
+const limiter = rateLimit({
+  max: 4, //Number of request allowed
+  windowMs: 60 * 60 * 1000, // Time frame - within an hour, max 60 requests allowed
+  message:
+    "We have received to many requests from this IP. Please try again after 1 hours",
+});
+app.use("/api", limiter);
 
 app.use(express.json()); //This function express.json() will return a middleware function that will attach the request body(getting from client) to the req object i.e (req,res)
 app.use(morgan("dev")); //3rd party library/function which will return a middleware function, this middleware will log information of request in terminal, i.e "GET /api/v1/movies 200 4.608 ms - 266"
