@@ -46,6 +46,13 @@ const validationErrorHandler = (err) => {
   return new CustomError(msg, 400);
 };
 
+const handleExpiredJwt = (err) => {
+  return new CustomError("Session token has expired! Please login again!", 401);
+};
+const handleJwtError = (err) => {
+  return new CustomError("Invalid Token! Please login again!", 401);
+};
+
 //Global error handler function
 module.exports = (error, req, res, next) => {
   error.statusCode = error.statusCode || 500;
@@ -60,6 +67,10 @@ module.exports = (error, req, res, next) => {
     if (error.code === 11000) error = duplicateKeyErrorHandler(error);
     //Mongoose validation errors
     if (error.name === "ValidationError") error = validationErrorHandler(error);
+    //jwt expired error
+    if (error.name === "TokenExpiredError") error = handleExpiredJwt(error);
+    //jwt token tempering error
+    if (error.name === "JsonWebTokenError") error = handleJwtError(error);
 
     prodErrors(res, error);
   }

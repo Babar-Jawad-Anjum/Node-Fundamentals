@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
       message: "Password & ConfirmPassword does not match!",
     },
   },
+  passwordChangedAt: Date,
 });
 
 //Password encryption logic
@@ -49,6 +50,20 @@ userSchema.pre("save", async function (next) {
 //adding method into User model
 userSchema.methods.comparePasswordInDb = async function (pswd, pswdDb) {
   return await bcrypt.compare(pswd, pswdDb);
+};
+
+//handler to check the password changed or not after issuing JWT
+userSchema.methods.isPasswordChanged = async function (JwtTimeStamp) {
+  if (this.passwordChangedAt) {
+    const passwordChangedTimeStamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    //password was changed after JWT issued
+    return JwtTimeStamp < passwordChangedTimeStamp;
+  }
+  return false;
 };
 
 const User = mongoose.model("User", userSchema);
